@@ -1,0 +1,1 @@
+2025-07-02T16:23:30.582-04:00  WARN 9168 --- [restaurante] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
