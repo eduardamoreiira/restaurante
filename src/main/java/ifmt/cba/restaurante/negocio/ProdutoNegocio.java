@@ -75,7 +75,7 @@ public class ProdutoNegocio {
 			throw new NotValidDataException("Erro ao excluir o produto - " + ex.getMessage());
 		}
 	}
-	
+
 	public List<ProdutoDTO> pesquisaTodos() throws NotFoundException {
 		try {
 			return this.toDTOAll(produtoRepository.findAll());
@@ -99,7 +99,6 @@ public class ProdutoNegocio {
 			throw new NotFoundException("Erro ao pesquisar produto abaixo do estoque minimo - " + ex.getMessage());
 		}
 	}
-
 
 	public ProdutoDTO pesquisaCodigo(int codigo) throws NotFoundException {
 		try {

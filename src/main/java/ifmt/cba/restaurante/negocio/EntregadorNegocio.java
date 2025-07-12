@@ -16,7 +16,7 @@ import ifmt.cba.restaurante.repository.EntregadorRepository;
 @Service
 public class EntregadorNegocio {
 
-    private ModelMapper modelMapper;
+	private ModelMapper modelMapper;
 
 	@Autowired
 	private EntregadorRepository entregadorRepository;
@@ -67,7 +67,7 @@ public class EntregadorNegocio {
 
 		try {
 			Entregador entregador = entregadorRepository.findById(codigo).get();
-			if ( entregador == null) {
+			if (entregador == null) {
 				throw new NotFoundException("Nao existe esse entregador");
 			}
 			entregadorRepository.delete(entregador);
@@ -115,5 +115,10 @@ public class EntregadorNegocio {
 
 	public Entregador toEntity(EntregadorDTO entregadorDTO) {
 		return this.modelMapper.map(entregadorDTO, Entregador.class);
+	}
+
+	public List<EntregadorDTO> listarTodosEntregadores() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'listarTodosEntregadores'");
 	}
 }

@@ -20,7 +20,7 @@ import ifmt.cba.restaurante.repository.RegistroEstoqueRepository;
 @Service
 public class RegistroEstoqueNegocio {
 
-    private ModelMapper modelMapper;
+	private ModelMapper modelMapper;
 
 	@Autowired
 	private RegistroEstoqueRepository registroRepository;
@@ -32,7 +32,8 @@ public class RegistroEstoqueNegocio {
 		this.modelMapper = new ModelMapper();
 	}
 
-	public RegistroEstoqueDTO inserir(RegistroEstoqueDTO registroEstoqueDTO) throws NotValidDataException, NotFoundException {
+	public RegistroEstoqueDTO inserir(RegistroEstoqueDTO registroEstoqueDTO)
+			throws NotValidDataException, NotFoundException {
 
 		RegistroEstoque registroEstoque = this.toEntity(registroEstoqueDTO);
 		String mensagemErros = registroEstoque.validar();
@@ -43,12 +44,12 @@ public class RegistroEstoqueNegocio {
 
 		try {
 			Produto produtoTemp = produtoRepository.findById(registroEstoque.getProduto().getCodigo()).get();
-			if(registroEstoque.getMovimento() == MovimentoEstoqueDTO.COMPRA){
+			if (registroEstoque.getMovimento() == MovimentoEstoqueDTO.COMPRA) {
 				produtoTemp.setEstoque(produtoTemp.getEstoque() + registroEstoque.getQuantidade());
-			}else{
+			} else {
 				produtoTemp.setEstoque(produtoTemp.getEstoque() - registroEstoque.getQuantidade());
 			}
-			
+
 			produtoRepository.save(produtoTemp);
 			registroEstoque = registroRepository.save(registroEstoque);
 		} catch (Exception ex) {
@@ -57,7 +58,8 @@ public class RegistroEstoqueNegocio {
 		return this.toDTO(registroEstoque);
 	}
 
-	public RegistroEstoqueDTO excluir(RegistroEstoqueDTO registroEstoqueDTO) throws NotValidDataException, NotFoundException {
+	public RegistroEstoqueDTO excluir(RegistroEstoqueDTO registroEstoqueDTO)
+			throws NotValidDataException, NotFoundException {
 
 		RegistroEstoque registroEstoque = this.toEntity(registroEstoqueDTO);
 		String mensagemErros = registroEstoque.validar();
@@ -68,12 +70,12 @@ public class RegistroEstoqueNegocio {
 
 		try {
 			Produto produtoTemp = produtoRepository.findById(registroEstoque.getProduto().getCodigo()).get();
-			if(registroEstoque.getMovimento() == MovimentoEstoqueDTO.COMPRA){
+			if (registroEstoque.getMovimento() == MovimentoEstoqueDTO.COMPRA) {
 				produtoTemp.setEstoque(produtoTemp.getEstoque() - registroEstoque.getQuantidade());
-			}else{
+			} else {
 				produtoTemp.setEstoque(produtoTemp.getEstoque() + registroEstoque.getQuantidade());
 			}
-			
+
 			produtoRepository.save(produtoTemp);
 			registroEstoque = registroRepository.save(registroEstoque);
 		} catch (Exception ex) {
@@ -95,19 +97,22 @@ public class RegistroEstoqueNegocio {
 		}
 	}
 
-    public List<RegistroEstoqueDTO> buscarPorMovimento(MovimentoEstoqueDTO movimento) throws NotFoundException {
-        try {
+	public List<RegistroEstoqueDTO> buscarPorMovimento(MovimentoEstoqueDTO movimento) throws NotFoundException {
+		try {
 			return this.toDTOAll(registroRepository.findByMovimento(movimento));
 		} catch (Exception ex) {
-			throw new NotFoundException("Erro ao pesquisar registro de estoque por tipo de movimento - " + ex.getMessage());
+			throw new NotFoundException(
+					"Erro ao pesquisar registro de estoque por tipo de movimento - " + ex.getMessage());
 		}
-    }
+	}
 
-	public List<RegistroEstoqueDTO> buscarPorMovimentoEData(MovimentoEstoqueDTO movimento, LocalDate data) throws NotFoundException {
+	public List<RegistroEstoqueDTO> buscarPorMovimentoEData(MovimentoEstoqueDTO movimento, LocalDate data)
+			throws NotFoundException {
 		try {
 			return this.toDTOAll(registroRepository.findByMovimentoAndData(movimento, data));
 		} catch (Exception ex) {
-			throw new NotFoundException("Erro ao pesquisar registro de estoque por tipo de movimento e data - " + ex.getMessage());
+			throw new NotFoundException(
+					"Erro ao pesquisar registro de estoque por tipo de movimento e data - " + ex.getMessage());
 		}
 	}
 

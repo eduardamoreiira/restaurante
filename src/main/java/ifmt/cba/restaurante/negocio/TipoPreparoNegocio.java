@@ -16,11 +16,11 @@ import ifmt.cba.restaurante.repository.TipoPreparoRepository;
 @Service
 public class TipoPreparoNegocio {
 
-    private ModelMapper modelMapper;
+	private ModelMapper modelMapper;
 
 	@Autowired
 	private TipoPreparoRepository tipoPreparoRepository;
-	
+
 	public TipoPreparoNegocio() {
 		this.modelMapper = new ModelMapper();
 	}
@@ -68,7 +68,7 @@ public class TipoPreparoNegocio {
 	public void excluir(int codigo) throws NotValidDataException, NotFoundException {
 		try {
 			TipoPreparo tipoPreparo = tipoPreparoRepository.findById(codigo).get();
-			if (tipoPreparo == null){
+			if (tipoPreparo == null) {
 				throw new NotFoundException("Tipo de Preparo nao existe");
 			}
 			tipoPreparoRepository.delete(tipoPreparo);
@@ -117,5 +117,4 @@ public class TipoPreparoNegocio {
 	public TipoPreparo toEntity(TipoPreparoDTO tipoPreparoDTO) {
 		return this.modelMapper.map(tipoPreparoDTO, TipoPreparo.class);
 	}
-
 }
