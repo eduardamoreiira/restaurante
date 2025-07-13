@@ -21,7 +21,7 @@ import ifmt.cba.restaurante.repository.ProdutoRepository;
 
 @RestController
 @RequestMapping("/estoque/registros")
-public class EstoqueController {
+public class RegistroEstoqueController {
 
     @Autowired
     private RegistroEstoqueNegocio registroEstoqueNegocio;
