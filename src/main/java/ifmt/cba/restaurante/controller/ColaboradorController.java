@@ -12,7 +12,7 @@ import ifmt.cba.restaurante.negocio.ColaboradorNegocio;
 import ifmt.cba.restaurante.exception.NotFoundException;
 import ifmt.cba.restaurante.exception.NotValidDataException;
 
-//Implementação Eduarda
+// Implementação Eduarda
 
 @RestController
 @RequestMapping("/colaboradores")
@@ -64,7 +64,6 @@ public class ColaboradorController {
         }
     }
 
-    // Endpoint para PESQUISAR todos os Colaboradores (GET)
     @GetMapping
     public ResponseEntity<List<ColaboradorDTO>> pesquisarTodosColaboradores() {
         try {
@@ -80,7 +79,7 @@ public class ColaboradorController {
         }
     }
 
-    // Endpoints adicionais para pesquisar colaboradores
+    // Endpoints adicionais para pesquisa por parte do nome e código
     @GetMapping("/nome/{parteNome}")
     public ResponseEntity<ColaboradorDTO> pesquisarColaboradorPorParteNome(@PathVariable String parteNome) {
         try {

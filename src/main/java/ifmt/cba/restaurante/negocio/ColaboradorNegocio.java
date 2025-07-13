@@ -15,7 +15,7 @@ import ifmt.cba.restaurante.repository.ColaboradorRepository;
 @Service
 public class ColaboradorNegocio {
 
-    private ModelMapper modelMapper;
+	private ModelMapper modelMapper;
 	private ColaboradorRepository colaboradorRepository;
 
 	public ColaboradorNegocio() {
@@ -64,7 +64,7 @@ public class ColaboradorNegocio {
 
 		try {
 			Colaborador colaborador = colaboradorRepository.findById(codigo).get();
-			if ( colaborador == null) {
+			if (colaborador == null) {
 				throw new NotFoundException("Nao existe esse colaborador");
 			}
 			colaboradorRepository.delete(colaborador);
