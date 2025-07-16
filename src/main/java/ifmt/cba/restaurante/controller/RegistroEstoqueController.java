@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import ifmt.cba.restaurante.dto.MovimentoEstoqueDTO;
 import ifmt.cba.restaurante.dto.RegistroEstoqueDTO;
 import ifmt.cba.restaurante.entity.Produto;
-import ifmt.cba.restaurante.dto.ProdutoDTO;
+//import ifmt.cba.restaurante.dto.ProdutoDTO;
 import ifmt.cba.restaurante.negocio.RegistroEstoqueNegocio;
 import ifmt.cba.restaurante.exception.NotFoundException;
 import ifmt.cba.restaurante.exception.NotValidDataException;
-import ifmt.cba.restaurante.repository.ProdutoRepository;
+//import ifmt.cba.restaurante.repository.ProdutoRepository;
 
 //Implementação Eduarda
 
