@@ -8,17 +8,15 @@ import org.springframework.web.bind.annotation.*;
 import ifmt.cba.restaurante.repository.PedidoRepository;
 import ifmt.cba.restaurante.repository.ProdutoRepository;
 import ifmt.cba.restaurante.repository.RegistroEstoqueRepository;
-import ifmt.cba.restaurante.repository.BairroRepository;
 import ifmt.cba.restaurante.entity.Pedido;
 import ifmt.cba.restaurante.entity.Produto;
 import ifmt.cba.restaurante.entity.RegistroEstoque;
-import ifmt.cba.restaurante.entity.Bairro;
 import ifmt.cba.restaurante.dto.MovimentoEstoqueDTO;
 import ifmt.cba.restaurante.dto.EstadoPedidoDTO;
 import ifmt.cba.restaurante.exception.NotFoundException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,11 +42,7 @@ public class RelatorioController {
     @Autowired
     private ProdutoRepository produtoRepository;
 
-    @Autowired
-    private BairroRepository bairroRepository;
 
-    // Armazena o percentual de custo fixo em memória (pode ser substituído por persistência real futuramente)
-    private static double percentualCustoFixo = 0.0;
 
     /**
      * Endpoint para consultar pedidos por período
@@ -646,135 +640,56 @@ public class RelatorioController {
         }
     }
 
-    /**
-     * Endpoint para configurar o percentual de custo fixo de produção
-     * @param percentual Valor percentual (ex: 10.5 para 10,5%)
-     * @return Mensagem de confirmação
-     */
-    @PostMapping("/custo-fixo")
-    public ResponseEntity<Map<String, Object>> configurarCustoFixo(@RequestParam double percentual) {
-        if (percentual < 0) {
-            Map<String, Object> erro = new HashMap<>();
-            erro.put("erro", "Percentual inválido");
-            erro.put("mensagem", "O percentual não pode ser negativo.");
-            return ResponseEntity.status(400).body(erro);
-        }
-        percentualCustoFixo = percentual;
-        Map<String, Object> resposta = new HashMap<>();
-        resposta.put("mensagem", "Percentual de custo fixo configurado com sucesso.");
-        resposta.put("percentualCustoFixo", percentualCustoFixo);
-        return ResponseEntity.ok(resposta);
-    }
+
 
     /**
-     * Endpoint para consultar o percentual de custo fixo de produção configurado
-     * @return Percentual atual
+     * Endpoint para consultar produtos com estoque abaixo da margem de segurança
+     * @return ResponseEntity com a lista de produtos com estoque baixo
      */
-    @GetMapping("/custo-fixo")
-    public ResponseEntity<Map<String, Object>> consultarCustoFixo() {
-        Map<String, Object> resposta = new HashMap<>();
-        resposta.put("percentualCustoFixo", percentualCustoFixo);
-        return ResponseEntity.ok(resposta);
-    }
-
-    /**
-     * Endpoint para configurar o custo de entrega para um bairro
-     * @param bairroId ID do bairro
-     * @param valor Valor da entrega
-     * @return Mensagem de confirmação
-     */
-    @PostMapping("/custo-entrega")
-    public ResponseEntity<Map<String, Object>> configurarCustoEntrega(
-            @RequestParam Integer bairroId,
-            @RequestParam double valor) {
+    @GetMapping("/estoque-baixo")
+    public ResponseEntity<Map<String, Object>> consultarProdutosEstoqueBaixo() {
         try {
-            Bairro bairro = bairroRepository.findById(bairroId)
-                .orElseThrow(() -> new NotFoundException("Bairro não encontrado"));
-
-            if (valor < 0) {
-                Map<String, Object> erro = new HashMap<>();
-                erro.put("erro", "Valor inválido");
-                erro.put("mensagem", "O valor da entrega não pode ser negativo.");
-                return ResponseEntity.status(400).body(erro);
+            List<Produto> produtos = produtoRepository.findAll();
+            
+            if (produtos.isEmpty()) {
+                throw new NotFoundException("Nenhum produto cadastrado no sistema");
             }
 
-            bairro.setCustoEntrega((float) valor);
-            bairroRepository.save(bairro);
-
-            Map<String, Object> resposta = new HashMap<>();
-            resposta.put("mensagem", "Custo de entrega configurado com sucesso.");
-            resposta.put("bairro", bairro.getNome());
-            resposta.put("custoEntrega", valor);
-            return ResponseEntity.ok(resposta);
-
-        } catch (NotFoundException e) {
-            Map<String, Object> erro = new HashMap<>();
-            erro.put("erro", "Não encontrado");
-            erro.put("mensagem", e.getMessage());
-            return ResponseEntity.status(404).body(erro);
-        } catch (Exception e) {
-            Map<String, Object> erro = new HashMap<>();
-            erro.put("erro", "Erro interno");
-            erro.put("mensagem", "Erro ao configurar custo de entrega: " + e.getMessage());
-            return ResponseEntity.status(500).body(erro);
-        }
-    }
-
-    /**
-     * Endpoint para consultar o custo de entrega de um bairro específico
-     * @param bairroId ID do bairro
-     * @return Valor da entrega para o bairro
-     */
-    @GetMapping("/custo-entrega")
-    public ResponseEntity<Map<String, Object>> consultarCustoEntrega(@RequestParam Integer bairroId) {
-        try {
-            Bairro bairro = bairroRepository.findById(bairroId)
-                .orElseThrow(() -> new NotFoundException("Bairro não encontrado"));
-
-            Map<String, Object> resposta = new HashMap<>();
-            resposta.put("bairro", bairro.getNome());
-            resposta.put("valorEntrega", bairro.getCustoEntrega());
-            return ResponseEntity.ok(resposta);
-
-        } catch (NotFoundException e) {
-            Map<String, Object> erro = new HashMap<>();
-            erro.put("erro", "Não encontrado");
-            erro.put("mensagem", e.getMessage());
-            return ResponseEntity.status(404).body(erro);
-        } catch (Exception e) {
-            Map<String, Object> erro = new HashMap<>();
-            erro.put("erro", "Erro interno");
-            erro.put("mensagem", "Erro ao consultar custo de entrega: " + e.getMessage());
-            return ResponseEntity.status(500).body(erro);
-        }
-    }
-
-    /**
-     * Endpoint para listar todos os custos de entrega configurados
-     * @return Lista com os custos de entrega por bairro
-     */
-    @GetMapping("/custos-entrega")
-    public ResponseEntity<Map<String, Object>> listarCustosEntrega() {
-        try {
-            List<Bairro> bairros = bairroRepository.findAll();
-
-            if (bairros.isEmpty()) {
-                throw new NotFoundException("Nenhum bairro cadastrado");
-            }
-
-            List<Map<String, Object>> custosEntrega = bairros.stream()
-                .map(bairro -> {
-                    Map<String, Object> custoMap = new HashMap<>();
-                    custoMap.put("bairroId", bairro.getCodigo());
-                    custoMap.put("bairro", bairro.getNome());
-                    custoMap.put("custoEntrega", bairro.getCustoEntrega());
-                    return custoMap;
+            // Filtra produtos com estoque abaixo da margem de segurança
+            List<Map<String, Object>> produtosEstoqueBaixo = produtos.stream()
+                .filter(produto -> {
+                    Integer estoqueAtual = produto.getEstoque();
+                    Integer estoqueMinimo = produto.getEstoqueMinimo();
+                    return estoqueAtual != null && estoqueMinimo != null && estoqueAtual < estoqueMinimo;
+                })
+                .map(produto -> {
+                    Map<String, Object> produtoMap = new HashMap<>();
+                    produtoMap.put("codigo", produto.getCodigo());
+                    produtoMap.put("nome", produto.getNome());
+                    produtoMap.put("quantidadeAtual", produto.getEstoque());
+                    produtoMap.put("estoqueMinimo", produto.getEstoqueMinimo());
+                    produtoMap.put("diferenca", produto.getEstoqueMinimo() - produto.getEstoque());
+                    return produtoMap;
+                })
+                .sorted((p1, p2) -> {
+                    // Ordena por diferença (mais críticos primeiro)
+                    Integer diff1 = (Integer) p1.get("diferenca");
+                    Integer diff2 = (Integer) p2.get("diferenca");
+                    return diff2.compareTo(diff1);
                 })
                 .collect(Collectors.toList());
 
-            Map<String, Object> resposta = new HashMap<>();
-            resposta.put("custosEntrega", custosEntrega);
-            return ResponseEntity.ok(resposta);
+            if (produtosEstoqueBaixo.isEmpty()) {
+                throw new NotFoundException("Nenhum produto com estoque abaixo da margem de segurança");
+            }
+
+            // Monta o resultado
+            Map<String, Object> resultado = new HashMap<>();
+            resultado.put("dataConsulta", LocalDate.now());
+            resultado.put("totalProdutos", produtosEstoqueBaixo.size());
+            resultado.put("produtos", produtosEstoqueBaixo);
+            
+            return ResponseEntity.ok(resultado);
 
         } catch (NotFoundException e) {
             Map<String, Object> erro = new HashMap<>();
@@ -784,67 +699,7 @@ public class RelatorioController {
         } catch (Exception e) {
             Map<String, Object> erro = new HashMap<>();
             erro.put("erro", "Erro interno");
-            erro.put("mensagem", "Erro ao listar custos de entrega: " + e.getMessage());
-            return ResponseEntity.status(500).body(erro);
-        }
-    }
-
-    /**
-     * Endpoint para configurar o custo de entrega para vários bairros em lote
-     * @param configuracoes Lista de configurações com bairroId e valor
-     * @return Mensagem de confirmação com os custos atualizados
-     */
-    @PostMapping("/custos-entrega/lote")
-    public ResponseEntity<Map<String, Object>> configurarCustosEntregaLote(
-            @RequestBody List<Map<String, Object>> configuracoes) {
-        try {
-            List<Map<String, Object>> custosAtualizados = new ArrayList<>();
-            List<String> erros = new ArrayList<>();
-
-            for (Map<String, Object> config : configuracoes) {
-                try {
-                    Integer bairroId = ((Number) config.get("bairroId")).intValue();
-                    double valor = ((Number) config.get("valor")).doubleValue();
-
-                    if (valor < 0) {
-                        erros.add("Bairro " + bairroId + ": O valor da entrega não pode ser negativo");
-                        continue;
-                    }
-
-                    Bairro bairro = bairroRepository.findById(bairroId)
-                        .orElseThrow(() -> new NotFoundException("Bairro não encontrado: " + bairroId));
-
-                    bairro.setCustoEntrega((float) valor);
-                    bairroRepository.save(bairro);
-
-                    Map<String, Object> custoAtualizado = new HashMap<>();
-                    custoAtualizado.put("bairroId", bairroId);
-                    custoAtualizado.put("bairro", bairro.getNome());
-                    custoAtualizado.put("custoEntrega", valor);
-                    custosAtualizados.add(custoAtualizado);
-
-                } catch (NotFoundException e) {
-                    erros.add(e.getMessage());
-                } catch (Exception e) {
-                    erros.add("Erro ao processar bairro: " + e.getMessage());
-                }
-            }
-
-            Map<String, Object> resposta = new HashMap<>();
-            resposta.put("mensagem", "Processamento de custos de entrega concluído");
-            resposta.put("custosAtualizados", custosAtualizados);
-            
-            if (!erros.isEmpty()) {
-                resposta.put("erros", erros);
-                return ResponseEntity.status(207).body(resposta); // 207 Multi-Status
-            }
-
-            return ResponseEntity.ok(resposta);
-
-        } catch (Exception e) {
-            Map<String, Object> erro = new HashMap<>();
-            erro.put("erro", "Erro interno");
-            erro.put("mensagem", "Erro ao configurar custos de entrega: " + e.getMessage());
+            erro.put("mensagem", "Erro ao consultar produtos com estoque baixo: " + e.getMessage());
             return ResponseEntity.status(500).body(erro);
         }
     }
