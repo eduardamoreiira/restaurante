@@ -17,4 +17,14 @@ public interface RegistroEstoqueRepository extends JpaRepository<RegistroEstoque
 
     List<RegistroEstoque> findByProduto(Produto produto);
 
+    /**
+     * Busca registros de estoque por período e tipo de movimento
+     * @param dataInicial Data inicial do período
+     * @param dataFinal Data final do período
+     * @param movimento Tipo do movimento de estoque
+     * @return Lista de registros de estoque que atendem aos critérios
+     */
+    
+    List<RegistroEstoque> findByDataBetweenAndMovimentoIn(LocalDate dataInicial, LocalDate dataFinal, List<MovimentoEstoqueDTO> movimentos);
+
 }
